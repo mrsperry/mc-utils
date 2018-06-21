@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ItemBuilder {
@@ -22,27 +23,27 @@ public class ItemBuilder {
         this.meta.setLore(new ArrayList<String>());
     }
 
-    public ItemBuilder material(Material material) {
+    public ItemBuilder setMaterial(Material material) {
         this.item.setType(material);
         return this;
     }
 
-    public ItemBuilder amount(int amount) {
+    public ItemBuilder setAmount(int amount) {
         this.item.setAmount(amount);
         return this;
     }
 
-    public ItemBuilder data(short data) {
+    public ItemBuilder setData(short data) {
         this.item.setDurability(data);
         return this;
     }
 
-    public ItemBuilder name(String name) {
+    public ItemBuilder setName(String name) {
         this.meta.setDisplayName(name);
         return this;
     }
 
-    public ItemBuilder lore(List<String> lore) {
+    public ItemBuilder setLore(List<String> lore) {
         this.meta.setLore(lore);
         return this;
     }
@@ -50,10 +51,17 @@ public class ItemBuilder {
     public ItemBuilder addLore(String loreLine) {
         List<String> temp = this.meta.getLore();
         temp.add(loreLine);
-        return this.lore(temp);
+        return this.setLore(temp);
     }
 
-    public ItemBuilder enchant(Enchantment enchantment, int level) {
+    public ItemBuilder setEnchantments(HashMap<Enchantment, Integer> enchantments) {
+        for (Enchantment enchant : enchantments.keySet()) {
+            this.meta.addEnchant(enchant, enchantments.get(enchant), true);
+        }
+        return this;
+    }
+
+    public ItemBuilder addEnchantment(Enchantment enchantment, int level) {
         this.meta.addEnchant(enchantment, level, true);
         return this;
     }

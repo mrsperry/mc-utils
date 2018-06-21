@@ -14,6 +14,7 @@ public class ItemParser {
     public static ItemStack parseItem(ConfigurationSection key) {
         Material material = Material.AIR;
         int amount = 0;
+        short damage = 0;
         String name = material.name();
         List<String> lore = new ArrayList<String>();
         HashMap<Enchantment, Integer> enchantments = new HashMap<Enchantment, Integer>();
@@ -33,6 +34,15 @@ public class ItemParser {
                 amount = Integer.parseInt(itemAmount);
             } catch (Exception ex) {
                 Bukkit.getLogger().warning("Could not parse item amount: " + itemAmount);
+            }
+        }
+
+        if (key.isInt(key.getName() + ".damage")) {
+            String damageAmount = key.getString(key.getName() + ".damage");
+            try {
+                damage = Short.parseShort(damageAmount);
+            } catch (Exception ex) {
+                Bukkit.getLogger().warning("Could not parse item damage: " + damageAmount);
             }
         }
 
@@ -78,7 +88,7 @@ public class ItemParser {
             }
         }
 
-        return new ItemBuilder(material).setAmount(amount).setName(name).setLore(lore).setEnchantments(enchantments).build();
+        return new ItemBuilder(material).setAmount(amount).setData(damage).setName(name).setLore(lore).setEnchantments(enchantments).build();
     }
 
     public static List<ItemStack> parseItems(ConfigurationSection section) {

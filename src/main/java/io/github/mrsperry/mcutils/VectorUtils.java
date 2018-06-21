@@ -1,0 +1,58 @@
+package io.github.mrsperry.mcutils;
+
+import javafx.util.Pair;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.util.Vector;
+
+public class VectorUtils {
+
+    public static boolean hasLOS(Location from, Location to) {
+        Pair<Location, Location> fixed = getFixedPoints(from, to);
+        from = fixed.getKey();
+        to = fixed.getValue();
+        double step = 0.1;
+        Location pos = from.clone();
+        Vector direction = getDirection(from, to).normalize().multiply(0.1);
+        double dist = to.distance(from);
+
+        for(double length = 0; length + step < dist; length += step) {
+            pos = pos.add(direction);
+            if(!pos.getBlock().getType().equals(Material.AIR)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static Vector getDirection(Location from, Location to) {
+        double diffX = to.getX() - from.getX();
+        double diffY = to.getY() - from.getY();
+        double diffZ = to.getZ() - from.getZ();
+
+        return new Vector(diffX, diffY, diffZ);
+    }
+
+    private static Pair<Location, Location> getFixedPoints(Location loc1, Location loc2) {
+        Location temp1 = loc1.clone().add(0.5, 0.5, 0.5);
+        Location temp2 = loc2.clone().add(0.5, 0.5, 0.5);
+
+        if(temp1.getX() < temp2.getX()) {
+            temp1.setX(temp1.getX() + 0.5);
+            temp2.setX(temp2.getX() - 0.5);
+        } else if(temp1.getX() > temp2.getX()){
+            temp1.setX(temp1.getX() - 0.5);
+            temp2.setX(temp2.getX() + 0.5);
+        }
+
+        if(temp1.getZ() < temp2.getZ()) {
+            temp1.setZ(temp1.getZ() + 0.5);
+            temp2.setZ(temp2.getZ() - 0.5);
+        } else if(temp1.getZ() > temp2.getZ()) {
+            temp1.setZ(temp1.getZ() - 0.5);
+            temp2.setZ(temp2.getZ() + 0.5);
+        }
+
+        return new Pair<Location, Location>(temp1, temp2);
+    }
+}

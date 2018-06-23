@@ -100,24 +100,6 @@ public class Particles {
         drawRoundedObject(center, radius, fill, count, (point) -> center.getWorld().spawnParticle(particle, point.x, y, point.z, 0, offX, offY, offZ, extra));
     }
 
-    public static void drawEllipse(Particle particle, Location center, double radius1, double radius2, int count) {
-        drawEllipse(particle, center, radius1, radius2, count, 0, 0, 0, 0);
-    }
-
-    public static void drawEllipse(Particle particle, Location center, double radius1, double radius2, int count, double offX, double offY, double offZ, double extra) {
-
-        for(int current = 0; current < count; current++) {
-            double z = center.getZ() + ((random.nextDouble() * radius2 * 2) - radius2);
-            double zDiff = z - center.getZ();
-            double x = (1 - Math.pow(zDiff, 2));
-
-            x = x / Math.pow(radius2, 2);
-            x = x * Math.pow(radius1, 2);
-            x = Math.sqrt(x) + center.getX();
-            center.getWorld().spawnParticle(particle, x, center.getY(), z, 0, offX, offY, offZ, extra);
-        }
-    }
-
     private static void drawRoundedObject(Location center, double radius, boolean fill, int count, RoundedShapeCallback task) {
         for (int current = 0; current < count; current++) {
             CircleVars point = CircleVars.getRandom(center, radius, fill);

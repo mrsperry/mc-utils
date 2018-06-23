@@ -10,7 +10,7 @@ public class ParticleColor {
 
         try {
             double tempRed = Integer.parseInt(hex.substring(0,2), 16);
-            color.red = tempRed == 0 ? -1 : tempRed / 255.0;
+            color.red = tempRed <= 20 ? -1 : tempRed / 255.0;
             color.green = Integer.parseInt(hex.substring(2,4), 16) / 255.0;
             color.blue = Integer.parseInt(hex.substring(4,6), 16) / 255.0;
 

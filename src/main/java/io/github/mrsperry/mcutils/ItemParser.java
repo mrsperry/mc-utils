@@ -13,7 +13,7 @@ import java.util.List;
 public class ItemParser {
     public static ItemStack parseItem(ConfigurationSection key) {
         Material material = Material.AIR;
-        int amount = 0;
+        int amount = 1;
         short damage = 0;
         String name = "";
         List<String> lore = new ArrayList<String>();

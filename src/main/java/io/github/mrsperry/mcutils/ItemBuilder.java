@@ -1,5 +1,6 @@
 package io.github.mrsperry.mcutils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -18,6 +19,10 @@ public class ItemBuilder {
     }
 
     public ItemBuilder(Material material) {
+        if (material == Material.AIR) {
+            Bukkit.getLogger().warning("Tried to build an item stack with air!");
+            return;
+        }
         this.item = new ItemStack(material, 1);
         this.meta = this.item.getItemMeta();
         this.meta.setLore(new ArrayList<String>());

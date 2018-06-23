@@ -15,12 +15,12 @@ public class ItemParser {
         Material material = Material.AIR;
         int amount = 0;
         short damage = 0;
-        String name = material.name();
+        String name = "";
         List<String> lore = new ArrayList<String>();
         HashMap<Enchantment, Integer> enchantments = new HashMap<Enchantment, Integer>();
 
-        if (key.isString(key.getName() + ".material")) {
-            String materialString = key.getString(key.getName() + ".material");
+        if (key.isString(".material")) {
+            String materialString = key.getString(".material");
             try {
                 material = Material.valueOf(materialString.toUpperCase().replace(" ", "_"));
             } catch (Exception ex) {
@@ -28,8 +28,8 @@ public class ItemParser {
             }
         }
 
-        if (key.isInt(key.getName() + ".amount")) {
-            String itemAmount = key.getString(key.getName() + ".amount");
+        if (key.isInt(".amount")) {
+            String itemAmount = key.getString(".amount");
             try {
                 amount = Integer.parseInt(itemAmount);
             } catch (Exception ex) {
@@ -37,8 +37,8 @@ public class ItemParser {
             }
         }
 
-        if (key.isInt(key.getName() + ".damage")) {
-            String damageAmount = key.getString(key.getName() + ".damage");
+        if (key.isInt(".damage")) {
+            String damageAmount = key.getString(".damage");
             try {
                 damage = Short.parseShort(damageAmount);
             } catch (Exception ex) {
@@ -46,16 +46,16 @@ public class ItemParser {
             }
         }
 
-        if (key.isString(key.getName() + ".name")) {
+        if (key.isString(".name")) {
             try {
-                name = key.getString(key.getName() + ".name").replace("`", "\u00A7");
+                name = key.getString(".name").replace("`", "\u00A7");
             } catch (Exception ex) {
                 Bukkit.getLogger().info("Could not set item name: " + name);
             }
         }
 
-        if (key.isList(key.getName() + ".lore")) {
-            for (String line : key.getStringList(key.getName() + ".lore")) {
+        if (key.isList(".lore")) {
+            for (String line : key.getStringList(".lore")) {
                 try {
                     lore.add(line.replace("`", "\u00A7"));
                 } catch (Exception ex) {
@@ -64,8 +64,8 @@ public class ItemParser {
             }
         }
 
-        if (key.isList(key.getName() + ".enchantments")) {
-            for (String enchantString : key.getStringList(key.getName() + ".enchantments")) {
+        if (key.isList(".enchantments")) {
+            for (String enchantString : key.getStringList(".enchantments")) {
                 String[] split = enchantString.split(":");
 
                 int level = 0;
@@ -79,16 +79,28 @@ public class ItemParser {
 
                 Enchantment enchantment = null;
                 try {
-                    enchantment = Enchantment.getByName(split[0]);
+                    enchantment = Enchantment.getByName(split[0].toUpperCase().replace(" ", "_"));
                 } catch (Exception ex) {
                     Bukkit.getLogger().warning("Could not parse enchantment: " + enchantString);
                 }
 
-                enchantments.put(enchantment, level);
+                if (enchantment != null) {
+                    enchantments.put(enchantment, level);
+                }
             }
         }
 
-        return new ItemBuilder(material).setAmount(amount).setData(damage).setName(name).setLore(lore).setEnchantments(enchantments).build();
+        ItemBuilder builder = new ItemBuilder(material).setAmount(amount).setData(damage);
+        if (!name.equals("")) {
+            builder.setName(name);
+        }
+        if (lore.size() > 0) {
+            builder.setLore(lore);
+        }
+        if (enchantments.size() > 0) {
+            builder.setEnchantments(enchantments);
+        }
+        return builder.build();
     }
 
     public static List<ItemStack> parseItems(ConfigurationSection section) {

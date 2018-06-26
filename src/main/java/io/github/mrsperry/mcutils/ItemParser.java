@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -98,9 +99,21 @@ public class ItemParser {
             builder.setLore(lore);
         }
         if (enchantments.size() > 0) {
-            builder.setEnchantments(enchantments);
+            if (material != Material.ENCHANTED_BOOK) {
+                builder.setEnchantments(enchantments);
+            }
         }
-        return builder.build();
+
+        ItemStack item = builder.build();
+        if (item.getType() == Material.ENCHANTED_BOOK) {
+            EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+            for (Enchantment enchantment : enchantments.keySet()) {
+                meta.addStoredEnchant(enchantment, enchantments.get(enchantment), true);
+            }
+            item.setItemMeta(meta);
+        }
+
+        return item;
     }
 
     public static List<ItemStack> parseItems(ConfigurationSection section) {

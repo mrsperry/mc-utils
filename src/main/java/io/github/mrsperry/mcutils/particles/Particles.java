@@ -1,5 +1,6 @@
-package io.github.mrsperry.mcutils;
+package io.github.mrsperry.mcutils.particles;
 
+import io.github.mrsperry.mcutils.VectorUtils;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.util.Vector;

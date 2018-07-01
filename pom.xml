@@ -6,17 +6,32 @@
     <groupId>io.github.mrsperry.mcutils</groupId>
     <artifactId>mc-utils</artifactId>
     <version>1.0.0</version>
+    <repositories>
+        <repository>
+            <id>worldedit</id>
+            <url>http://maven.sk89q.com/artifactory/repo</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.12.2-R0.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldedit</artifactId>
+            <version>5.7-SNAPSHOT</version>
+        </dependency>
     </dependencies>
-
     <build>
         <plugins>
-            <!-- Jar Creation Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

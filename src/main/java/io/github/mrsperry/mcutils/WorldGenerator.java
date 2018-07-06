@@ -29,8 +29,12 @@ public class WorldGenerator {
         }
     }
 
+    public World createWorld(String name) {
+        return generate(name, new Location(null, 0, 64, 0), new HashSet<>());
+    }
+
     public World createWorld(String name, Location spawn) {
-        return generate(name, spawn, new HashSet<File>());
+        return generate(name, spawn, new HashSet<>());
     }
 
     public World createWorld(String name, Location spawn, HashSet<File> schematics) {
@@ -38,7 +42,7 @@ public class WorldGenerator {
     }
 
     private World generate(String name, Location spawn, HashSet<File> schematics) {
-        if (Bukkit.getWorld(name) != null) {
+        if (Bukkit.getWorld(name) == null) {
             WorldCreator creator = new WorldCreator(name);
             creator.generator(new ChunkGenerator() {
                 @Override
@@ -48,6 +52,7 @@ public class WorldGenerator {
             });
 
             World world = creator.createWorld();
+            spawn.setWorld(world);
             world.setSpawnLocation(spawn);
 
             for (File schematic : schematics) {

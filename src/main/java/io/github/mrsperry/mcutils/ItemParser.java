@@ -1,5 +1,7 @@
 package io.github.mrsperry.mcutils;
 
+import io.github.mrsperry.mcutils.builders.ItemBuilder;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;

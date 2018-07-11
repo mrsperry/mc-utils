@@ -1,4 +1,4 @@
-package io.github.mrsperry.mcutils;
+package io.github.mrsperry.mcutils.builders;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ItemBuilder {
-    private ItemStack item;
-    private ItemMeta meta;
+    protected ItemStack item;
+    protected ItemMeta meta;
 
     public ItemBuilder() {
         this(Material.STONE);

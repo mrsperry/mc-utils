@@ -10,9 +10,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class PotionBuilder extends ItemBuilder {
     private PotionMeta potionMeta;
@@ -52,6 +50,11 @@ public class PotionBuilder extends ItemBuilder {
 
     public PotionBuilder addEffect(PotionEffectType type, int duration, int amplifier) {
         this.effects.add(new PotionEffect(type, duration, amplifier));
+        return this;
+    }
+
+    public PotionBuilder setEffects(List<PotionEffect> effects) {
+        this.effects = effects;
         return this;
     }
 

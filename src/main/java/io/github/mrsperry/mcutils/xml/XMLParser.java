@@ -4,6 +4,7 @@ import javafx.util.Pair;
 
 import org.bukkit.Bukkit;
 
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
@@ -112,6 +113,16 @@ public class XMLParser {
         }
     }
 
+    public Color getContentColor(XMLObject parent, Color value) {
+        try {
+            String[] split = parent.getContent().split(",");
+            return Color.fromRGB(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("Could not parse color from content: " + parent.getName() + " : " + parent.getContent());
+            return value;
+        }
+    }
+
     // * * * * * * * *
     // Attributes
     // * * * * * * * *
@@ -188,6 +199,16 @@ public class XMLParser {
             return EntityType.valueOf(this.getAttribute(parent, name, value).toString().replace(" ", "_").toUpperCase());
         } catch (Exception ex) {
             Bukkit.getLogger().warning("Could not parse entity type from attribute: " + parent.getName() + " : " + name);
+            return value;
+        }
+    }
+
+    public Color getAttributeColor(XMLObject parent, String name, Color value) {
+        try {
+            String[] split = this.getAttribute(parent, name, value).toString().split(",");
+            return Color.fromRGB(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("Could not parse color from attribute: " + parent.getName() + " : " + name);
             return value;
         }
     }

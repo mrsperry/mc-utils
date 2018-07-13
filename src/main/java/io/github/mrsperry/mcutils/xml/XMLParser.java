@@ -68,6 +68,15 @@ public class XMLParser {
         }
     }
 
+    public boolean getContentboolean(XMLObject parent, boolean value) {
+        try {
+            return Boolean.parseBoolean(parent.getContent());
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("Could not parse boolean from content: " + parent.getName() + " : " + parent.getContent());
+            return value;
+        }
+    }
+
     public Pair<Integer, Integer> getContentRange(XMLObject parent, Pair<Integer, Integer> value) {
         try {
             String[] range = parent.getContent().split("-");
@@ -154,6 +163,15 @@ public class XMLParser {
             return Double.parseDouble(this.getAttribute(parent, name, value).toString());
         } catch (Exception ex) {
             Bukkit.getLogger().warning("Could not parse double from attribute: " + parent.getName() + " : " + name);
+            return value;
+        }
+    }
+
+    public boolean getAttributeBoolean(XMLObject parent, String name, boolean value) {
+        try {
+            return Boolean.parseBoolean(this.getAttribute(parent, name, value).toString());
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("Could not parse boolean from attribute: " + parent.getName() + " : " + name);
             return value;
         }
     }

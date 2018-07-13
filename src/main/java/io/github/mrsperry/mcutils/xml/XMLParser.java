@@ -244,6 +244,10 @@ public class XMLParser {
     // Object finding
     // * * * * * * * *
 
+    public XMLObject getRoot() {
+        return this.root;
+    }
+
     public XMLObject findObject(String path) {
         return this.find(this.root, path, 0);
     }

@@ -125,6 +125,9 @@ public class XMLParser {
     public Color getContentColor(XMLObject parent, Color value) {
         try {
             String[] split = parent.getContent().split(",");
+            if (split.length == 1) {
+                return this.parseColor(split[0]);
+            }
             return Color.fromRGB(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
         } catch (Exception ex) {
             Bukkit.getLogger().warning("Could not parse color from content: " + parent.getName() + " : " + parent.getContent());
@@ -224,20 +227,14 @@ public class XMLParser {
     public Color getAttributeColor(XMLObject parent, String name, Color value) {
         try {
             String[] split = this.getAttribute(parent, name, value).toString().split(",");
+            if (split.length == 1) {
+                return this.parseColor(split[0]);
+            }
             return Color.fromRGB(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
         } catch (Exception ex) {
             Bukkit.getLogger().warning("Could not parse color from attribute: " + parent.getName() + " : " + name);
             return value;
         }
-    }
-
-    private Object getAttribute(XMLObject parent, String name, Object value) {
-        HashMap<String, String> attributes = parent.getAttributes();
-        if (attributes.containsKey(name)) {
-            return attributes.get(name);
-        }
-
-        return value;
     }
 
     // * * * * * * * *
@@ -281,5 +278,59 @@ public class XMLParser {
 
         Bukkit.getLogger().warning("Could not find XML object with name: " + path);
         return null;
+    }
+
+    // * * * * * * * *
+    // Private methods
+    // * * * * * * * *
+
+    private Color parseColor(String color) throws Exception {
+        switch (color.toLowerCase()) {
+            case "aqua":
+                return Color.AQUA;
+            case "black":
+                return Color.BLACK;
+            case "blue":
+                return Color.BLUE;
+            case "fuchsia":
+                return Color.FUCHSIA;
+            case "gray":
+                return Color.GRAY;
+            case "green":
+                return Color.GREEN;
+            case "lime":
+                return Color.LIME;
+            case "maroon":
+                return Color.MAROON;
+            case "navy":
+                return Color.NAVY;
+            case "olive":
+                return Color.OLIVE;
+            case "orange":
+                return Color.ORANGE;
+            case "purple":
+                return Color.PURPLE;
+            case "red":
+                return Color.RED;
+            case "silver":
+                return Color.SILVER;
+            case "teal":
+                return Color.TEAL;
+            case "white":
+                return Color.WHITE;
+            case "yellow":
+                return Color.YELLOW;
+            default:
+                throw new Exception("Invalid color: " + color);
+        }
+    }
+
+    private Object getAttribute(XMLObject parent, String name, Object value) {
+        HashMap<String, String> attributes = parent.getAttributes();
+        if (attributes.containsKey(name)) {
+            return attributes.get(name);
+        }
+
+        return value;
     }
 }

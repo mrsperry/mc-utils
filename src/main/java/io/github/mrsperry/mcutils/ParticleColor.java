@@ -23,7 +23,7 @@ public class ParticleColor {
     public static ParticleColor fromDecimal(int r, int g, int b) {
         ParticleColor color = new ParticleColor();
 
-        color.red = (r == 0) ? -1 : r / 255.0;
+        color.red = (r <= 20) ? -1 : r / 255.0;
         color.green = g / 255.0;
         color.blue = b / 255.0;
 

@@ -1,4 +1,4 @@
-package io.github.mrsperry.mcutils;
+package io.github.mrsperry.mcutils.particles;
 
 public class ParticleColor {
     public double red;

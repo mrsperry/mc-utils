@@ -1,10 +1,13 @@
 package io.github.mrsperry.mcutils;
 
+import io.github.mrsperry.mcutils.builders.ItemBuilder;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +16,7 @@ import java.util.List;
 public class ItemParser {
     public static ItemStack parseItem(ConfigurationSection key) {
         Material material = Material.AIR;
-        int amount = 0;
+        int amount = 1;
         short damage = 0;
         String name = "";
         List<String> lore = new ArrayList<String>();
@@ -98,9 +101,21 @@ public class ItemParser {
             builder.setLore(lore);
         }
         if (enchantments.size() > 0) {
-            builder.setEnchantments(enchantments);
+            if (material != Material.ENCHANTED_BOOK) {
+                builder.setEnchantments(enchantments);
+            }
         }
-        return builder.build();
+
+        ItemStack item = builder.build();
+        if (item.getType() == Material.ENCHANTED_BOOK) {
+            EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+            for (Enchantment enchantment : enchantments.keySet()) {
+                meta.addStoredEnchant(enchantment, enchantments.get(enchantment), true);
+            }
+            item.setItemMeta(meta);
+        }
+
+        return item;
     }
 
     public static List<ItemStack> parseItems(ConfigurationSection section) {

@@ -82,6 +82,8 @@ public class XMLParser {
             String[] range = parent.getContent().split("-");
             if (range.length == 2) {
                 return new Pair<>(Integer.parseInt(range[0]), Integer.parseInt(range[1]));
+            } else if(range.length == 1) {
+                return new Pair<>(Integer.parseInt(range[0]), Integer.parseInt(range[0]));
             }
 
             throw new Exception("Range must be two numbers separated by a dash");
@@ -184,6 +186,8 @@ public class XMLParser {
             String[] range = this.getAttribute(parent, name, value).toString().split("-");
             if (range.length == 2) {
                 return new Pair<>(Integer.parseInt(range[0]), Integer.parseInt(range[1]));
+            } else if(range.length == 1) {
+                return new Pair<>(Integer.parseInt(range[0]), Integer.parseInt(range[0]));
             }
 
             throw new Exception("Range must be two numbers separated by a dash");
@@ -245,40 +249,40 @@ public class XMLParser {
         return this.root;
     }
 
-    public XMLObject findObject(String path) {
-        return this.find(this.root, path, 0);
-    }
-
-    public XMLObject findObject(String path, XMLObject start) {
-        return this.find(start, path, 0);
-    }
-
-    public List<XMLObject> findAllObjects(String path) {
-        XMLObject object = this.find(this.root, path, 0);
-        return (object == null ? new ArrayList<>() : object.getChildren());
-    }
-
-    public List<XMLObject> findAllObjects(String path, XMLObject start) {
-        XMLObject object = this.find(start, path, 0);
-        return (object == null ? new ArrayList<>() : object.getChildren());
-    }
-
-    private XMLObject find(XMLObject object, String path, int index) {
-        String[] split = path.split("\\.");
-
-        for (XMLObject child : object.getChildren()) {
-            if (child.getName().equals(split[split.length - 1])) {
-                return child;
-            }
-
-            if (child.getName().equals(split[index])) {
-                return find(child, path, ++index);
-            }
-        }
-
-        Bukkit.getLogger().warning("Could not find XML object with name: " + path);
-        return null;
-    }
+//    public XMLObject findObject(String path) {
+//        return this.find(this.root, path, 0);
+//    }
+//
+//    public XMLObject findObject(String path, XMLObject start) {
+//        return this.find(start, path, 0);
+//    }
+//
+//    public List<XMLObject> findAllObjects(String path) {
+//        XMLObject object = this.find(this.root, path, 0);
+//        return (object == null ? new ArrayList<>() : object.getChildren());
+//    }
+//
+//    public List<XMLObject> findAllObjects(String path, XMLObject start) {
+//        XMLObject object = this.find(start, path, 0);
+//        return (object == null ? new ArrayList<>() : object.getChildren());
+//    }
+//
+//    private XMLObject find(XMLObject object, String path, int index) {
+//        String[] split = path.split("\\.");
+//
+//        for (XMLObject child : object.getChildren()) {
+//            if (child.getName().equals(split[split.length - 1])) {
+//                return child;
+//            }
+//
+//            if (child.getName().equals(split[index])) {
+//                return find(child, path, ++index);
+//            }
+//        }
+//
+//        Bukkit.getLogger().warning("Could not find XML object with name: " + path);
+//        return null;
+//    }
 
     // * * * * * * * *
     // Private methods

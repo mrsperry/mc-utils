@@ -58,4 +58,24 @@ public class XMLObject {
     public List<XMLObject> getChildren() {
         return this.children;
     }
+
+    public XMLObject getFirstChild(String name) {
+        for(int i = 0; i < this.children.size(); i++) {
+            if(this.children.get(i).getName().equalsIgnoreCase(name)) {
+                return this.children.get(i);
+            }
+        }
+        return null;
+    }
+
+    public List<XMLObject> getAllChildren(String name) {
+        List<XMLObject> result = new ArrayList<>();
+
+        for(int i = 0; i < this.children.size(); i++) {
+            if(this.children.get(i).getName().equalsIgnoreCase(name)) {
+                result.add(this.children.get(i));
+            }
+        }
+        return result;
+    }
 }

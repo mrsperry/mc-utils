@@ -47,6 +47,10 @@ public class XMLObject {
         return this.content;
     }
 
+    public boolean hasContent() {
+        return !this.content.equalsIgnoreCase("");
+    }
+
     public HashMap<String, String> getAttributes() {
         return this.attributes;
     }

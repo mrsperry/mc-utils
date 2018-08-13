@@ -15,7 +15,8 @@ public class EntityTypes {
             EntityType.SILVERFISH,     EntityType.SILVERFISH,      EntityType.SKELETON,
             EntityType.SLIME,          EntityType.SPIDER,          EntityType.STRAY,
             EntityType.VEX,            EntityType.VINDICATOR,      EntityType.WITCH,
-            EntityType.WITHER,         EntityType.WITHER_SKELETON, EntityType.ZOMBIE
+            EntityType.WITHER,         EntityType.WITHER_SKELETON, EntityType.ZOMBIE,
+            EntityType.ZOMBIE_VILLAGER
     );
 
     private static ArrayList<EntityType> neutral = Lists.newArrayList(

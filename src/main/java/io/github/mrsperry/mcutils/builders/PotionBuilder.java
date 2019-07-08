@@ -66,8 +66,7 @@ public class PotionBuilder extends ItemBuilder {
                     effect.getDuration(),
                     effect.getAmplifier(),
                     false,
-                    true,
-                    this.potionMeta.getColor()), true);
+                    true), true);
         }
 
         return super.build();

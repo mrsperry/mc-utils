@@ -46,8 +46,8 @@ public class WorldGenerator {
             WorldCreator creator = new WorldCreator(name);
             creator.generator(new ChunkGenerator() {
                 @Override
-                public byte[] generate(World world, Random random, int x, int z) {
-                    return new byte[65536];
+                public ChunkData generateChunkData(World world, Random random, int x, int z, ChunkGenerator.BiomeGrid biome) {
+                    return createChunkData(world);
                 }
             });
 

@@ -13,8 +13,9 @@ public class VectorUtils {
         to = fixed.getValue();
         double step = 0.1;
         Location pos = from.clone();
-        Vector direction = getDirection(from, to).normalize().multiply(0.1);
-        double dist = to.distance(from);
+        Vector direction = getDirection(from, to);
+        double dist = direction.length();
+        direction = direction.normalize().multiply(0.1);
 
         for(double length = 0; length + step < dist; length += step) {
             pos = pos.add(direction);
@@ -26,11 +27,7 @@ public class VectorUtils {
     }
 
     public static Vector getDirection(Location from, Location to) {
-        double diffX = to.getX() - from.getX();
-        double diffY = to.getY() - from.getY();
-        double diffZ = to.getZ() - from.getZ();
-
-        return new Vector(diffX, diffY, diffZ);
+        return to.toVector().subtract(from.toVector());
     }
 
     private static Pair<Location, Location> getFixedPoints(Location loc1, Location loc2) {
@@ -53,6 +50,6 @@ public class VectorUtils {
             temp2.setZ(temp2.getZ() + 0.5);
         }
 
-        return new Pair<Location, Location>(temp1, temp2);
+        return new Pair<>(temp1, temp2);
     }
 }

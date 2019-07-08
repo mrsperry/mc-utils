@@ -15,9 +15,10 @@ public class Particles {
     }
 
     public static void drawLine(Particle particle, Location from, Location to, double stepSize, int count, double offX, double offY, double offZ, double extra) {
-        Vector direction = VectorUtils.getDirection(from, to).normalize().multiply(stepSize);
+        Vector direction = VectorUtils.getDirection(from, to);
+        double dist = direction.length();
+        direction = direction.normalize().multiply(stepSize);
         Location pos = from.clone();
-        double dist = to.distance(from);
 
         for(double magnitude = 0; magnitude + stepSize <= dist; magnitude += stepSize) {
             pos.add(direction);

@@ -1,7 +1,6 @@
 package io.github.mrsperry.mcutils.xml;
 
 import javafx.util.Pair;
-
 import org.bukkit.Bukkit;
 
 import org.bukkit.Color;
@@ -15,9 +14,7 @@ import org.w3c.dom.Node;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class XMLParser {
     private XMLObject root;

@@ -1,82 +1,157 @@
 package io.github.mrsperry.mcutils;
 
-import com.google.common.collect.Lists;
-
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class ConfigManager {
-    private static JavaPlugin plugin = null;
-    private static ArrayList<String> configNames = Lists.newArrayList();
-    private static HashMap<String, YamlConfiguration> configs = new HashMap<>();
+    // The owning plugin
+    private JavaPlugin plugin;
+    // All config names this manager handles
+    private ArrayList<String> configNames;
+    // All configs currently handled
+    private HashMap<String, YamlConfiguration> configs;
 
-    public static void initialize(JavaPlugin plg, ArrayList<String> names) {
-        ConfigManager.initialize(plg, names, true);
+    /**
+     * Creates a new config manager and saves all default configs
+     * @param plugin The owning plugin
+     * @param names All config names this manager handles (do not include file extensions ex: "players" NOT "players.yml")
+     */
+    public ConfigManager(JavaPlugin plugin, ArrayList<String> names) {
+        this(plugin, names, true);
     }
 
-    public static void initialize(JavaPlugin plg, ArrayList<String> names, boolean saveConfigs) {
-        plugin = plg;
-        configNames = names;
+    /**
+     * Creates a new config manager
+     * @param plugin The owning plugin
+     * @param names All config names this manager handles (do not include file extensions ex: "players" NOT "players.yml")
+     * @param saveConfigs If default configs from the jar should be saved
+     */
+    public ConfigManager(JavaPlugin plugin, ArrayList<String> names, boolean saveConfigs) {
+        // Set variables
+        this.plugin = plugin;
+        this.configNames = names;
+        this.configs = new HashMap<>();
 
+        // Check if default configs should be save
         if (saveConfigs) {
-            ConfigManager.saveDefaultConfigs();
+            this.plugin.getLogger().info("Saving default configs...");
+
+            this.saveDefaultConfigs();
         }
     }
 
-    public static void saveDefaultConfigs() {
-        File directory = new File(plugin.getDataFolder().getAbsolutePath() + "/configs/");
+    /**
+     * Saves default config files from the jar
+     *
+     * This creates a file if one does not exist and loads the contents of the file
+     */
+    public void saveDefaultConfigs() {
+        // Get the config directory
+        File directory = new File(this.plugin.getDataFolder().getAbsolutePath() + "/configs/");
+
+        // Create the directory if it does not exist
         if (!directory.exists()) {
-            directory.mkdir();
+            this.plugin.getLogger().info("Config directory did not exist, creating...");
+            directory.mkdirs();
         }
 
-        for (String name : configNames) {
+        // Search for configs that are handled by this manager
+        for (String name : this.configNames) {
             name = name.toLowerCase() + ".yml";
 
+            // Get the file in the config folder
             File file = new File(directory, name);
-            if (!file.exists()) {
-                try {
-                    plugin.saveResource("configs/" + name, false);
-                    plugin.getLogger().info("Creating missing config '" + name + "'");
-                } catch (IllegalArgumentException ex) {
-                    plugin.getLogger().severe("Could not find YML file '" + name + "' in plugin jar!");
-                    continue;
+            try {
+                // Check if the file exists
+                if (!file.exists()) {
+                    // If it doesn't exist, save a new file with contents from the jar
+                    this.plugin.saveResource("configs/" + name, false);
+                    this.plugin.getLogger().info("Creating missing config '" + name + "'");
                 }
+            } catch (IllegalArgumentException ex) {
+                this.plugin.getLogger().severe("Could not find or create YML file: " + name);
+                continue;
             }
 
+            // Create a new config
             YamlConfiguration config = new YamlConfiguration();
             try {
-                config.load(file);
-            } catch (IOException | InvalidConfigurationException ex) {
-                plugin.getLogger().severe("An error occurred while loading config '" + name + "'");
+                // Create a new scanner for the file
+                Scanner reader = new Scanner(file);
+                // Create a new builder for building the text from the file
+                StringBuilder builder = new StringBuilder();
+
+                // Loop through all lines in the file
+                while (reader.hasNextLine()) {
+                    builder.append(reader.nextLine()).append("\n");
+                }
+                reader.close();
+
+                // Load the config from the read lines
+                config.loadFromString(builder.toString().trim());
+            } catch (NullPointerException | IOException | InvalidConfigurationException ex) {
+                this.plugin.getLogger().severe("An error occurred while loading config '" + name + "'");
                 ex.printStackTrace();
             }
 
-            configs.put(name.substring(0, name.length() - 4), config);
+            // Add the config (removing the file extension from its name)
+            this.configs.put(name.substring(0, name.length() - 4), config);
         }
     }
 
-    public static YamlConfiguration getConfig(String name) {
-        return configs.getOrDefault(name, null);
+    /**
+     * Gets a config file this manager handles
+     * @param name The name of the config file
+     * @return The config file or null if it could not be found
+     */
+    public YamlConfiguration getConfig(String name) {
+        return this.configs.getOrDefault(name, null);
     }
 
-    public static void saveConfig(YamlConfiguration config) {
+    /**
+     * Saves a config file this manager handles
+     * @param name The name of the config file
+     */
+    public void saveConfig(String name) {
+        // Get the config file to save
+        YamlConfiguration config = this.configs.getOrDefault(name, null);
+
         try {
-            config.save(new File(config.getName()));
+            // Get the file this config will be saved to
+            File file = new File(this.plugin.getDataFolder() + "/configs/" + name + ".yml");
+
+            // Create a reader from the config
+            Scanner reader = new Scanner(config.saveToString());
+            // Create a writer for the file
+            FileWriter writer = new FileWriter(file, file.createNewFile());
+
+            // Loop through all lines in the config
+            while (reader.hasNextLine()) {
+                // Write the line to the file
+                writer.write(reader.nextLine() + "\n");
+            }
+            reader.close();
+            writer.close();
         } catch (IOException ex) {
-            plugin.getLogger().severe("An error occurred while saving config '" + config.getName() + "'");
+            this.plugin.getLogger().severe("An error occurred while saving config '" + name + ".yml'");
             ex.printStackTrace();
         }
     }
 
-    public static void saveAllConfigs() {
-        for (YamlConfiguration config : configs.values()) {
-            ConfigManager.saveConfig(config);
+    /**
+     * Saves all config files handled by this manager
+     */
+    public void saveAllConfigs() {
+        this.plugin.getLogger().info("Saving " + this.configs.size() + " config(s)");
+
+        for (String name : this.configs.keySet()) {
+            this.saveConfig(name);
         }
     }
 }

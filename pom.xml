@@ -30,6 +30,11 @@
             <version>5.7-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>12.0.1</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

@@ -1,6 +1,7 @@
 package io.github.mrsperry.mcutils.builders;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -44,7 +45,7 @@ public class ItemBuilder {
     }
 
     public ItemBuilder setName(String name) {
-        this.meta.setDisplayName(name);
+        this.meta.setDisplayName(ChatColor.RESET + name);
         return this;
     }
 

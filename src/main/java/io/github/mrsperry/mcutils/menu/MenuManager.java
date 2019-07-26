@@ -40,16 +40,6 @@ public class MenuManager implements Listener {
         }
     }
 
-    public Menu getViewingMenu(Player player) {
-        for (Menu menu : this.menus.values()) {
-            if (menu.getViewers().contains(player)) {
-                return menu;
-            }
-        }
-
-        return null;
-    }
-
     public Menu getMenu(String id) {
         return this.menus.getOrDefault(id, null);
     }

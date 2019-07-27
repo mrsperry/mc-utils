@@ -38,6 +38,11 @@ public class SwappableMenuItem extends MenuItem {
         this.index = index;
     }
 
+    public void setIndex(int index) {
+        this.index = index;
+        super.setItem(this.items.get(index));
+    }
+
     public int getIndex() {
         return this.index;
     }

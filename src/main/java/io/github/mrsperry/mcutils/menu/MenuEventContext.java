@@ -9,6 +9,12 @@ public class MenuEventContext {
     private Menu menu;
     private MenuItem item;
 
+    /**
+     * Creates a new context for an inventory click event to be used by menu item on-click consumers
+     * @param player The player that clicked
+     * @param menu The menu the player clicked in
+     * @param item The menu item the player clicked
+     */
     public MenuEventContext(Player player, Menu menu, MenuItem item) {
         this.player = player;
         this.menu = menu;

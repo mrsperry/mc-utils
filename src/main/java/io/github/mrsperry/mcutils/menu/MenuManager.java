@@ -17,13 +17,26 @@ public class MenuManager implements Listener {
     private JavaPlugin plugin;
     private HashSet<Menu> openMenus;
 
+    /**
+     * Creates a new menu manager
+     * @param plugin The owning plugin
+     */
     public MenuManager(JavaPlugin plugin) {
         this.plugin = plugin;
         this.openMenus = new HashSet<>();
 
+        // Register events
         this.plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
+    /**
+     * Creates a new menu
+     * @param player The player this menu should open for
+     * @param title The title of the menu
+     * @param slots The number of slots for the menu (truncated to a factor of 9)
+     * @param items A list of menu items to add to the menu
+     * @return The menu that was created
+     */
     public Menu createNewMenu(Player player, String title, int slots, HashSet<MenuItem> items) {
         Menu menu = new Menu(player, title, slots, items);
         this.openMenus.add(menu);

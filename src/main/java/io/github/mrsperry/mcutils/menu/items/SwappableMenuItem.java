@@ -11,9 +11,18 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 public class SwappableMenuItem extends MenuItem {
+    // The current index of the item
     private int index;
+    // The list of item stacks that can be swapped
     private ArrayList<ItemStack> items;
 
+    /**
+     * Creates a new swappable menu item that allows an unlimited number of swaps when clicked (useful for multi-state options)
+     * @param slot The slot for this item
+     * @param item The item stack to put in the slot
+     * @param callback The consumer that is called when this item is clicked
+     * @param items Any number of item stacks that can be swapped to
+     */
     public SwappableMenuItem(int slot, ItemStack item, Consumer<MenuEventContext> callback, ItemStack... items) {
         super(slot, item, callback);
 
@@ -28,6 +37,9 @@ public class SwappableMenuItem extends MenuItem {
         super.onClick(context);
     }
 
+    /**
+     * Swaps the current item out with the next in line
+     */
     public void swap() {
         int index = this.index + 1;
         if (index >= this.items.size()) {

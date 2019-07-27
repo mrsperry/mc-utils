@@ -8,9 +8,13 @@ import org.bukkit.inventory.ItemStack;
 import java.util.function.Consumer;
 
 public abstract class MenuItem {
+    // The owning menu
     private Menu menu;
+    // The slot this item is in
     private int slot;
+    // The item stack this item uses
     private ItemStack item;
+    // The on click callback
     private Consumer<MenuEventContext> callback;
 
     public MenuItem(int slot, ItemStack item, Consumer<MenuEventContext> callback) {

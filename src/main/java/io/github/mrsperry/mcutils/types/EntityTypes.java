@@ -1,4 +1,4 @@
-package io.github.mrsperry.mcutils;
+package io.github.mrsperry.mcutils.types;
 
 import com.google.common.collect.Lists;
 import org.bukkit.entity.EntityType;

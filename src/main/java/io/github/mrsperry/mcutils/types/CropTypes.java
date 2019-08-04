@@ -8,12 +8,12 @@ import java.util.ArrayList;
 
 public class CropTypes {
     private static ArrayList<Material> harvestable = Lists.newArrayList(
-        Material.WHEAT, Material.CARROTS, Material.POTATOES, Material.BEETROOTS
+        Material.WHEAT, Material.CARROTS, Material.POTATOES, Material.BEETROOTS, Material.NETHER_WART
     );
 
     private static ArrayList<Material> breakable = Lists.newArrayList(
         Material.MELON,  Material.PUMPKIN,      Material.COCOA_BEANS,    Material.SUGAR_CANE,  Material.BAMBOO,
-        Material.CACTUS, Material.RED_MUSHROOM, Material.BROWN_MUSHROOM, Material.NETHER_WART
+        Material.CACTUS, Material.RED_MUSHROOM, Material.BROWN_MUSHROOM
     );
 
     private static ArrayList<Material> clickable = Lists.newArrayList(

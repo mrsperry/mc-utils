@@ -12,6 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class MenuManager implements Listener {
     private JavaPlugin plugin;
@@ -38,7 +39,20 @@ public class MenuManager implements Listener {
      * @return The menu that was created
      */
     public Menu createNewMenu(Player player, String title, int slots, HashSet<MenuItem> items) {
-        Menu menu = new Menu(player, title, slots, items);
+        return this.createNewMenu(player, title, slots, items, null);
+    }
+
+    /**
+     * Creates a new menu
+     * @param player The player this menu should open for
+     * @param title The title of the menu
+     * @param slots The number of slots for the menu (truncated to a factor of 9)
+     * @param items A list of menu items to add to the menu
+     * @param onClose A function that is called when the menu is closed
+     * @return The menu that was created
+     */
+    public Menu createNewMenu(Player player, String title, int slots, HashSet<MenuItem> items, Consumer<Menu> onClose) {
+        Menu menu = new Menu(player, title, slots, items, onClose);
         this.openMenus.add(menu);
 
         return menu;
@@ -70,6 +84,8 @@ public class MenuManager implements Listener {
     public void onInventoryClose(InventoryCloseEvent event) {
         for (Menu menu : this.openMenus) {
             if (menu.getInventory() == event.getInventory()) {
+                menu.onClose();
+
                 this.openMenus.remove(menu);
                 return;
             }

@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 import java.util.HashSet;
+import java.util.function.Consumer;
 
 public class Menu {
     // The player that opened this menu
@@ -17,13 +18,16 @@ public class Menu {
     private int slots;
     // The items to be added to the inventory
     private HashSet<MenuItem> items;
+    // The function that runs when the menu is closed
+    private Consumer<Menu> onClose;
     // The actual inventory of the menu
     private Inventory inventory;
 
-    Menu(Player player, String title, int slots, HashSet<MenuItem> items) {
+    Menu(Player player, String title, int slots, HashSet<MenuItem> items, Consumer<Menu> onClose) {
         this.player = player;
         this.title = title;
         this.items = items;
+        this.onClose = onClose;
 
         // Set the slots to the minimum of 9 if they are below it
         if (slots < 9) {
@@ -54,7 +58,17 @@ public class Menu {
      */
     public void close() {
         if (this.inventory.getViewers().contains(this.player)) {
+            this.onClose();
             this.player.closeInventory();
+        }
+    }
+
+    /**
+     * Runs the function that will run when the menu is closed
+     */
+    public void onClose() {
+        if (this.onClose != null) {
+            this.onClose.accept(this);
         }
     }
 
@@ -81,8 +95,8 @@ public class Menu {
         this.inventory.setItem(item.getSlot(), item.getItem());
     }
 
-    public Inventory getInventory() {
-        return this.inventory;
+    public Player getPlayer() {
+        return this.player;
     }
 
     public String getTitle() {
@@ -95,5 +109,13 @@ public class Menu {
 
     public HashSet<MenuItem> getItems() {
         return this.items;
+    }
+
+    public Consumer<Menu> getOnClose() {
+        return this.onClose;
+    }
+
+    public Inventory getInventory() {
+        return this.inventory;
     }
 }

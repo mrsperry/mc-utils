@@ -3,8 +3,10 @@ package io.github.mrsperry.mcutils.menu;
 import io.github.mrsperry.mcutils.menu.items.MenuItem;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashSet;
 import java.util.function.Consumer;
@@ -85,6 +87,19 @@ public class Menu {
         }
 
         return null;
+    }
+
+    /**
+     * Removes a menu item from this menu
+     * @param slot The slot of the menu item
+     */
+    public void removeMenuItem(int slot) {
+        MenuItem item = this.getMenuItem(slot);
+        if (item != null) {
+            this.items.remove(item);
+
+            this.inventory.setItem(slot, new ItemStack(Material.AIR));
+        }
     }
 
     /**

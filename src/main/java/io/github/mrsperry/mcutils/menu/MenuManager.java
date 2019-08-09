@@ -17,6 +17,7 @@ import java.util.function.Consumer;
 public class MenuManager implements Listener {
     private JavaPlugin plugin;
     private HashSet<Menu> openMenus;
+    private HashMap<Player, MenuHistory> histories;
 
     /**
      * Creates a new menu manager
@@ -25,6 +26,7 @@ public class MenuManager implements Listener {
     public MenuManager(JavaPlugin plugin) {
         this.plugin = plugin;
         this.openMenus = new HashSet<>();
+        this.histories = new HashMap<>();
 
         // Register events
         this.plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -55,7 +57,35 @@ public class MenuManager implements Listener {
         Menu menu = new Menu(player, title, slots, items, onClose);
         this.openMenus.add(menu);
 
+        // Add this menu to the player's history
+        if (this.histories.containsKey(player)) {
+            MenuHistory history = this.histories.get(player);
+            history.addSafeMenu(menu, true);
+
+            this.histories.put(player, history);
+        } else {
+            this.histories.put(player, new MenuHistory(this, menu));
+        }
+
         return menu;
+    }
+
+    /**
+     * Opens an existing menu
+     * @param menu The menu to open
+     */
+    public void createNewMenu(Menu menu) {
+        menu.getPlayer().openInventory(menu.getInventory());
+        this.openMenus.add(menu);
+    }
+
+    /**
+     * Gets the player's menu history
+     * @param player The player
+     * @return The menu history or null if none can be found
+     */
+    public MenuHistory getPlayerMenuHistory(Player player) {
+        return this.histories.getOrDefault(player, null);
     }
 
     @EventHandler

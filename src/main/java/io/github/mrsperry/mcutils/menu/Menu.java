@@ -36,10 +36,10 @@ public class Menu {
             slots = 9;
         }
 
-        // Truncate the number of slots to a factor of 9
+        // Round the number of slots up to a factor of 9
         int remainder = slots % 9;
         if (remainder != 0) {
-            slots -= remainder;
+            slots += (9 - remainder);
         }
         this.slots = slots;
 

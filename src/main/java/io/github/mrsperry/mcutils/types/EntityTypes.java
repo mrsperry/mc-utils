@@ -7,17 +7,17 @@ import java.util.ArrayList;
 
 public class EntityTypes {
     private static ArrayList<EntityType> hostile = Lists.newArrayList(
-            EntityType.BLAZE,      EntityType.CAVE_SPIDER,     EntityType.CREEPER,
-            EntityType.DROWNED,    EntityType.ELDER_GUARDIAN,  EntityType.ENDER_DRAGON,
-            EntityType.ENDERMAN,   EntityType.EVOKER,          EntityType.GHAST,
-            EntityType.GIANT,      EntityType.GUARDIAN,        EntityType.HUSK,
-            EntityType.ILLUSIONER, EntityType.MAGMA_CUBE,      EntityType.PHANTOM,
-            EntityType.PIG_ZOMBIE, EntityType.PILLAGER,        EntityType.RAVAGER,
-            EntityType.SHULKER,    EntityType.SILVERFISH,      EntityType.SILVERFISH,
-            EntityType.SKELETON,   EntityType.SLIME,           EntityType.SPIDER,
-            EntityType.STRAY,      EntityType.VEX,             EntityType.VINDICATOR,
-            EntityType.WITCH,      EntityType.WITHER,          EntityType.WITHER_SKELETON,
-            EntityType.ZOMBIE,     EntityType.ZOMBIE_VILLAGER
+            EntityType.BLAZE,           EntityType.CAVE_SPIDER,     EntityType.CREEPER,
+            EntityType.DROWNED,         EntityType.ELDER_GUARDIAN,  EntityType.ENDER_DRAGON,
+            EntityType.ENDERMAN,        EntityType.EVOKER,          EntityType.GHAST,
+            EntityType.GIANT,           EntityType.GUARDIAN,        EntityType.HUSK,
+            EntityType.ILLUSIONER,      EntityType.MAGMA_CUBE,      EntityType.PHANTOM,
+            EntityType.PIG_ZOMBIE,      EntityType.PILLAGER,        EntityType.RAVAGER,
+            EntityType.SHULKER,         EntityType.SILVERFISH,      EntityType.SKELETON,
+            EntityType.SLIME,           EntityType.SPIDER,          EntityType.STRAY,
+            EntityType.VEX,             EntityType.VINDICATOR,      EntityType.WITCH,
+            EntityType.WITHER,          EntityType.WITHER_SKELETON, EntityType.ZOMBIE,
+            EntityType.ZOMBIE_VILLAGER
     );
 
     private static ArrayList<EntityType> neutral = Lists.newArrayList(

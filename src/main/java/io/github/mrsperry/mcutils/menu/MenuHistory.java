@@ -39,7 +39,20 @@ public class MenuHistory {
      * @return True if the index is not zero, false otherwise
      */
     public boolean decrementIndex() {
+        return this.decrementIndex(false);
+    }
+
+    /**
+     * Tries to decrement the index of the history
+     * @param remove If the previous index should be removed
+     * @return True if the index is not zero, false otherwise
+     */
+    public boolean decrementIndex(boolean remove) {
         if (this.index != 0) {
+            if (remove) {
+                this.history.remove(this.index);
+            }
+
             this.manager.createNewMenu(this.history.get(--this.index));
             return true;
         }

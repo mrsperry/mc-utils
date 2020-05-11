@@ -20,10 +20,21 @@ public class CropTypes {
         Material.SWEET_BERRY_BUSH
     );
 
+    private static ArrayList<Material> seeds = Lists.newArrayList(
+        Material.WHEAT_SEEDS, Material.BEETROOT_SEEDS, Material.MELON_SEEDS, Material.PUMPKIN_SEEDS
+    );
+
+    private static ArrayList<Material> saplings = Lists.newArrayList(
+        Material.ACACIA_SAPLING, Material.BIRCH_SAPLING, Material.DARK_OAK_SAPLING, Material.JUNGLE_SAPLING, Material.OAK_SAPLING,
+        Material.SPRUCE_SAPLING
+    );
+
     public static ArrayList<Material> getAllTypes() {
         ArrayList<Material> types = CropTypes.harvestable;
         types.addAll(CropTypes.breakable);
         types.addAll(CropTypes.clickable);
+        types.addAll(CropTypes.seeds);
+        types.addAll(CropTypes.saplings);
 
         return types;
     }
@@ -35,7 +46,16 @@ public class CropTypes {
     public static ArrayList<Material> getBreakableTypes() {
         return CropTypes.breakable;
     }
+
     public static ArrayList<Material> getClickableTypes() {
         return CropTypes.clickable;
+    }
+
+    public static ArrayList<Material> getSeedTypes() {
+        return CropTypes.seeds;
+    }
+
+    public static ArrayList<Material> getSaplingTypes() {
+        return CropTypes.saplings;
     }
 }

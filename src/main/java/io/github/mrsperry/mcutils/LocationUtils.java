@@ -1,11 +1,81 @@
 package io.github.mrsperry.mcutils;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 
 import java.util.Random;
 
 public class LocationUtils {
     private static Random random = new Random();
+
+    /**
+     * Checks if a given location is safe for a player to stand on
+     * <br><br>
+     * This checks if the block below the location is <b>not</b> passable and <b>not</b> water or lava.
+     * <br><br>
+     * Additionally, it will check the block on the location and the block above (to allow a two block tall player) to see if they <b>are</b> passable and <b>not</b> lava.
+     * <br><br>
+     * The block on the location <b>may be</b> water however the block at eye level <b>must</b> be air.
+     * @param location The location to check
+     * @return If the location is safe for a player to stand on
+     */
+    private static boolean isLocationSafe(final Location location) {
+        final Block block = location.getBlock();
+        // Clone of the origin location; using `.add()` and `.subtract()` modify the variable
+        final Location checker = location.clone();
+
+        // Check if the feet location is a valid block (water is allowed)
+        if (!block.isPassable() || block.getType() == Material.LAVA) {
+            return false;
+        }
+
+        // Check if the block below the origin is a valid block
+        final Block below = checker.subtract(0, 1, 0).getBlock();
+        final Material belowType = below.getType();
+        if (below.isPassable() || belowType == Material.WATER || below.getType() == Material.LAVA) {
+            return false;
+        }
+
+        // Check if the block above the origin is a valid block
+        final Block eyes = checker.add(0, 2, 0).getBlock();
+        final Material eyeType = eyes.getType();
+        return eyes.isPassable() && eyeType != Material.WATER && eyeType != Material.LAVA;
+    }
+
+    /**
+     * Gets a random safe location within the given radius
+     * @param location The origin location
+     * @param radius How many blocks on each axis (negative and positive axis as well) should be searched for a new location
+     * @param tries The number of tries before giving up
+     * @return A random safe location within the given radius; or null if the number of tries ran out or a safe location could not be found
+     */
+    public static Location getRandomSafeLocation(final Location location, final double radius, final int tries) {
+        return LocationUtils.getRandomSafeLocation(location, radius, radius, radius, tries);
+    }
+
+    /**
+     * Gets a random safe location within the given radii
+     * @param location The origin location
+     * @param xAmount The maximum number of blocks on the X axis to search
+     * @param yAmount The maximum number of blocks on the Y axis to search
+     * @param zAmount The maximum number of blocks on the Z axis to search
+     * @param tries The number of tries before giving up
+     * @return A random safe location within the given radii; or null if the number of tries ran out or a safe location could not be found
+     */
+    public static Location getRandomSafeLocation(final Location location, final double xAmount, final double yAmount, final double zAmount, final int tries) {
+        for (int totalTries = 0; totalTries < tries; totalTries++) {
+            // Get a new random position
+            final Location target = LocationUtils.randomize(location, xAmount, yAmount, zAmount);
+
+            // Check if the location is safe
+            if (LocationUtils.isLocationSafe(target)) {
+                return target;
+            }
+        }
+
+        return null;
+    }
 
     /**
      * Gives a new location within the offset amount

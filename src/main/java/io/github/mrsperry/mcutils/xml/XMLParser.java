@@ -1,6 +1,7 @@
 package io.github.mrsperry.mcutils.xml;
 
-import javafx.util.Pair;
+import io.github.mrsperry.mcutils.classes.Pair;
+
 import org.bukkit.Bukkit;
 
 import org.bukkit.Color;

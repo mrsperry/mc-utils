@@ -1,6 +1,7 @@
 package io.github.mrsperry.mcutils;
 
-import javafx.util.Pair;
+import io.github.mrsperry.mcutils.classes.Pair;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.util.Vector;

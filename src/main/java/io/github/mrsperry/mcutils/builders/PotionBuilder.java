@@ -23,6 +23,11 @@ public class PotionBuilder extends ItemBuilder {
         this.effects = new ArrayList<>();
     }
 
+    public PotionBuilder setBase(PotionData data) {
+        this.potionMeta.setBasePotionData(data);
+        return this;
+    }
+
     public PotionBuilder setBase(PotionType type) {
         this.potionMeta.setBasePotionData(new PotionData(type));
         return this;

@@ -102,4 +102,18 @@ public class LocationUtils {
             location.getY() - yAmount + (random.nextDouble() * (yAmount * 2)),
             location.getZ() - zAmount + (random.nextDouble() * (zAmount * 2)));
     }
+
+
+    /**
+     * Sets the X, Y, and Z coordinates of a given location
+     * @param location The original location
+     * @param x X coordinate to be set
+     * @param y Y coordinate to be set
+     * @param z Z coordinate to be set
+     */
+    public static void setXYZ(final Location location, final double x, final double y, final double z) {
+        location.setX(x);
+        location.setY(y);
+        location.setZ(z);
+    }
 }

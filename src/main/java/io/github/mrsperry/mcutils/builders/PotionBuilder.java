@@ -48,6 +48,11 @@ public class PotionBuilder extends ItemBuilder {
         return this;
     }
 
+    public PotionBuilder addEffect(PotionEffect effect) {
+        this.effects.add(effect);
+        return this;
+    }
+
     public PotionBuilder addEffect(PotionEffectType type, int duration) {
         this.effects.add(new PotionEffect(type, duration, 0));
         return this;

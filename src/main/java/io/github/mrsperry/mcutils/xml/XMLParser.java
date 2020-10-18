@@ -1,338 +1,470 @@
 package io.github.mrsperry.mcutils.xml;
 
+import io.github.mrsperry.mcutils.builders.ItemBuilder;
+import io.github.mrsperry.mcutils.builders.PotionBuilder;
 import io.github.mrsperry.mcutils.classes.Pair;
 
-import org.bukkit.Bukkit;
+import org.bukkit.*;
 
-import org.bukkit.Color;
-import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentWrapper;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class XMLParser {
-    private XMLObject root;
-
-    public XMLParser(File file) {
-        Document document;
+    /**
+     * Parses an XML document
+     * @param file The XML document to parse
+     * @return The root element of the document
+     */
+    public static Element parse(final File file) {
+        final Document document;
         try {
             document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
         } catch (Exception ex) {
-            Bukkit.getLogger().severe("Could not create document instance: " + file.getName());
-            return;
+            Bukkit.getLogger().severe("Could not parse XML file: " + file.getName());
+            return null;
         }
 
-        Node root = document.getDocumentElement();
+        final Element root = document.getDocumentElement();
         root.normalize();
 
-        this.root = new XMLObject((Element) root, null);
+        return root;
     }
 
-    // * * * * * * * *
-    // Content
-    // * * * * * * * *
+    /**
+     * Gets a node's child elements
+     * @param node The parent node
+     * @return A set of child elements
+     */
+    public static Set<Element> getChildElements(final Node node) {
+        final HashSet<Element> elements = new HashSet<>();
 
-    public byte getContentByte(XMLObject parent, byte value) {
-        try {
-            return Byte.parseByte(parent.getContent());
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse byte from content: " + parent.getName() + " : " + parent.getContent());
-            return value;
+        final NodeList children = node.getChildNodes();
+        for (int index = 0; index < children.getLength(); index++) {
+            final Node child = children.item(index);
+
+            // Only add element nodes
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                elements.add((Element) child);
+            }
         }
+
+        return elements;
     }
 
-    public int getContentInt(XMLObject parent, int value) {
-        try {
-            return Integer.parseInt(parent.getContent());
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse int from content: " + parent.getName() + " : " + parent.getContent());
-            return value;
+    /**
+     * Parses a constant value
+     * <br><br>
+     * This capitalizes the string and replaces all spaces with underscores ex: "the example" -> "THE_EXAMPLE"
+     * @param constant The constant to parse
+     * @return The formatted string
+     */
+    public static String parseConstant(final String constant) {
+        return constant.toUpperCase().replaceAll(" ", "_");
+    }
+
+    /**
+     * Parses a range value
+     * <br><br>
+     * Ranges are formatted as follows: {@code 1-3}
+     * @param range The range to parse
+     * @return A pair containing the min and max value
+     */
+    public static Pair<Double, Double> parseRange(final String range) {
+        // Check if the range is a formatted range or a single number
+        if (range.contains("-")) {
+            final String[] split = range.split("-");
+
+            // Parse each number
+            try {
+                return new Pair<>(Double.parseDouble(split[0]), Double.parseDouble(split[1]));
+            } catch (final Exception ex) {
+                Bukkit.getLogger().severe("Could not parse range: " + range);
+                return null;
+            }
         }
-    }
 
-    public double getContentDouble(XMLObject parent, double value) {
+        // Parse the number
+        final double number;
         try {
-            return Double.parseDouble(parent.getContent());
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse double from content: " + parent.getName() + " : " + parent.getContent());
-            return value;
+            number = Double.parseDouble(range);
+        } catch (final Exception ex) {
+            Bukkit.getLogger().severe("Could not pare range: " + range);
+            return null;
         }
+
+        return new Pair<>(number, number);
     }
 
-    public boolean getContentboolean(XMLObject parent, boolean value) {
-        try {
-            return Boolean.parseBoolean(parent.getContent());
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse boolean from content: " + parent.getName() + " : " + parent.getContent());
-            return value;
+    /**
+     * Parses a duration value
+     * <br><br>
+     * Duration are formatted as follows: 15s | 15m | 15h | 15d | *
+     * <br>
+     * {@code s} = seconds
+     * <br>
+     * {@code m} = minutes
+     * <br>
+     * {@code h} = hours
+     * <br>
+     * {@code d} = days
+     * <br>
+     * {@code *} = infinite
+     * @param duration The duration to parse
+     * @return The number of ticks the duration represents
+     */
+    public static int parseDuration(final String duration) {
+        // Check if the duration is infinite
+        if (duration.equals("*")) {
+            return Integer.MAX_VALUE;
         }
+
+        // Parse the number before modifiers
+        final int number;
+        try {
+            number = Integer.parseInt(duration.substring(0, duration.length() - 1));
+        } catch (final Exception ex) {
+            Bukkit.getLogger().severe("Could not parse duration number: " + duration);
+            return -1;
+        }
+
+        // Apply the tick modifier
+        int multiplier = 20;
+        if (duration.endsWith("m")) {
+            multiplier *= 60;
+        } else if (duration.endsWith("h")) {
+            multiplier *= 3600;
+        } else if (duration.endsWith("d")) {
+            multiplier *= 86400;
+        }
+
+        return number * multiplier;
     }
 
-    public Pair<Integer, Integer> getContentRange(XMLObject parent, Pair<Integer, Integer> value) {
+    /**
+     * Parses a location value
+     * <br><br>
+     * Location elements are formatted as follows:
+     * <pre>{@code
+     * <location pitch="80.5" yaw="0">45.5,23,1.34</location>
+     * }</pre>
+     * The pitch and yaw attributes may be excluded independently
+     * @param element The element to parse
+     * @param world The world the location resides in
+     * @return The corresponding location or null if it could not be parsed
+     */
+    public static Location parseLocation(final Element element, final World world) {
+        final Location location;
+
+        // Parse the coordinates
+        final String content = element.getTextContent();
         try {
-            String[] range = parent.getContent().split("-");
-            if (range.length == 2) {
-                return new Pair<>(Integer.parseInt(range[0]), Integer.parseInt(range[1]));
-            } else if(range.length == 1) {
-                return new Pair<>(Integer.parseInt(range[0]), Integer.parseInt(range[0]));
+            final String[] coords = content.split(",");
+
+            location = new Location(world,
+                    Double.parseDouble(coords[0]),
+                    Double.parseDouble(coords[1]),
+                    Double.parseDouble(coords[2]));
+        } catch (final Exception ex) {
+            Bukkit.getLogger().severe("Could not parse location coordinates: " + content);
+            return null;
+        }
+
+        // Check for a pitch attribute
+        if (element.hasAttribute("pitch")) {
+            final String pitch = element.getAttribute("pitch");
+
+            try {
+                location.setPitch(Float.parseFloat(pitch));
+            } catch (final Exception ex) {
+                Bukkit.getLogger().severe("Could not parse location pitch: " + pitch);
+                return null;
+            }
+        }
+
+        // Check for a yaw attribute
+        if (element.hasAttribute("yaw")) {
+            final String yaw = element.getAttribute("yaw");
+
+            try {
+                location.setYaw(Float.parseFloat(yaw));
+            } catch (final Exception ex) {
+                Bukkit.getLogger().severe("Could not parse location yaw: " + yaw);
+                return null;
+            }
+        }
+
+        return location;
+    }
+
+    /**
+     * Parses a material value
+     * <br><br>
+     * Material elements are formatted as follows:
+     * <pre>{@code
+     *     <type>stone bricks</type>
+     * }</pre>
+     * @param element The element to parse
+     * @return The corresponding material or null if it was invalid
+     */
+    public static Material parseMaterial(final Element element) {
+        final String content = element.getTextContent();
+
+        final Material material;
+        try {
+            material = Material.valueOf(XMLParser.parseConstant(content));
+        } catch (final Exception ex) {
+            Bukkit.getLogger().severe("Could not parse material: " + content);
+            return null;
+        }
+
+        return material;
+    }
+
+    /**
+     * Parses an item stack value
+     * <br><br>
+     * Item stack elements are formatted as follows:
+     * <pre>{@code
+     * <parent>diamond sword</parent>
+     * }</pre>
+     * or
+     * <pre>{@code
+     * <parent>
+     *     <item name="Flamebringer">
+     *         <material>diamond sword</material>
+     *         <enchants>
+     *             <enchant level="2">fire aspect</enchant>
+     *         </enchants>
+     *         <lore>
+     *             <line>It is said to have culled the Icewalkers...</line>
+     *             <line>Perhaps it will do so again?</line>
+     *         </lore>
+     *     </item>
+     * </parent>
+     * }</pre>
+     * The name and amount attributes are optional, as are the enchants and lore tags
+     * @param element The element to parse
+     * @return The corresponding item stack or null if it was invalid
+     */
+    public static ItemStack parseItem(final Element element) {
+        // Check if the item is strictly a material
+        if (XMLParser.getChildElements(element).size() == 0) {
+            final Material material = XMLParser.parseMaterial(element);
+            if (material == null) {
+                return null;
             }
 
-            throw new Exception("Range must be two numbers separated by a dash");
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse range from content: " + parent.getName() + " : " + parent.getContent());
-            return value;
+            return new ItemStack(material);
         }
-    }
 
-    public Material getContentMaterial(XMLObject parent, Material value) {
-        try {
-            return Material.valueOf(parent.getContent().replace(" ", "_").toUpperCase());
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse material from content: " + parent.getName() + " : " + parent.getContent());
-            return value;
+        final ItemBuilder stack = new ItemBuilder();
+
+        if (element.hasAttribute("name")) {
+            stack.setName(element.getAttribute("name"));
         }
-    }
 
-    public PotionEffectType getContentPotionEffect(XMLObject parent, PotionEffectType value) {
-        try {
-            PotionEffectType type = PotionEffectType.getByName(parent.getContent().replace(" ", "_").toUpperCase());
-            if (type == null) {
-                throw new Exception("Potion type cannot be null");
+        for (final Element child : XMLParser.getChildElements(element)) {
+            switch (child.getTagName()) {
+                case "material":
+                    final Material material = XMLParser.parseMaterial(child);
+                    if (material == null) {
+                        return null;
+                    }
+
+                    stack.setMaterial(material);
+                    break;
+                case "enchants":
+                    for (final Element enchantChild : XMLParser.getChildElements(child)) {
+                        final Pair<Enchantment, Integer> enchant = XMLParser.parseEnchant(enchantChild);
+                        if (enchant == null) {
+                            return null;
+                        }
+
+                        stack.addEnchantment(enchant.getKey(), enchant.getValue());
+                    }
+                    break;
+                case "lore":
+                    for (final Element line : XMLParser.getChildElements(child)) {
+                        stack.addLore(line.getTextContent());
+                    }
+                    break;
             }
-            return type;
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse potion effect from content: " + parent.getName() + " : " + parent.getContent());
-            return value;
         }
+
+        return stack.build();
     }
 
-    public EntityType getContentEntityType(XMLObject parent, EntityType value) {
-        try {
-            return EntityType.valueOf(parent.getContent().replace(" ", "_").toUpperCase());
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse entity type from content: " + parent.getName() + " : " + parent.getContent());
-            return value;
-        }
-    }
+    /**
+     * Parses an enchantment value
+     * <br><br>
+     * Enchantment elements are formatted as follows:
+     * <pre>{@code
+     * <enchants>
+     *     <enchant level="2">fire aspect</enchant>
+     * </enchants>
+     * }</pre>
+     * The level attribute may be excluded (default level is 1)
+     * <br><br>
+     * Note that this method can only parse enchantments under the default Minecraft namespace
+     * @param element The element to parse
+     * @return A pair containing the enchantment and its level or null if either were invalid
+     */
+    public static Pair<Enchantment, Integer> parseEnchant(final Element element) {
+        final String content = element.getTextContent();
+        // Get the namespaced key for this enchantment
+        final NamespacedKey key = NamespacedKey.minecraft(XMLParser.parseConstant(content).toLowerCase());
 
-    public Color getContentColor(XMLObject parent, Color value) {
-        try {
-            String[] split = parent.getContent().split(",");
-            if (split.length == 1) {
-                return this.parseColor(split[0]);
+        // Get the actual enchantment value
+        final Enchantment enchant = EnchantmentWrapper.getByKey(key);
+        if (enchant == null) {
+            Bukkit.getLogger().severe("Could not parse enchantment: " + content);
+            return null;
+        }
+
+        int level = 1;
+        if (element.hasAttribute("level")) {
+            final String levelString = element.getAttribute("level");
+
+            try {
+                level = Integer.parseInt(levelString);
+            } catch (final Exception ex) {
+                Bukkit.getLogger().severe("Could not parse enchantment level: " + levelString);
+                return null;
             }
-            return Color.fromRGB(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse color from content: " + parent.getName() + " : " + parent.getContent());
-            return value;
         }
+
+        return new Pair<>(enchant, level);
     }
 
-    // * * * * * * * *
-    // Attributes
-    // * * * * * * * *
+    /**
+     * Parses a potion value
+     * <br><br>
+     * Potion elements are formatted as follows:
+     * <pre>{@code
+     * <potion color="238,201,75" duration="30s" amplifier="2">regeneration</potion>
+     * }</pre>
+     * You may exclude the color, duration, and amplifier attributes
+     * <br><br>
+     * For multiple effects on a single potion use the following:
+     * <pre>{@code
+     * <potion color="255,255,128">
+     *     <potion-base duration="30s" amplifier="3">slowness</potion-base>
+     *     <potion-effect amplifier="3">healing</potion-effect>
+     *     <potion-effect duration="3m">resistance</potion-effect>
+     * </potion>
+     * }</pre>
+     * The potion base defined the base effect and the other effects are added on
+     * @param element The element to parse
+     * @return A potion item stack or null if it was invalid
+     */
+    public static ItemStack parsePotion(final Element element) {
+        final PotionBuilder potion = new PotionBuilder();
 
-    public String getAttributeString(XMLObject parent, String name, String value) {
-        return this.getAttribute(parent, name, value).toString();
-    }
+        if (element.hasAttribute("color")) {
+            final String content = element.getAttribute("color");
+            final String[] colors = content.split(",");
 
-    public byte getAttributeByte(XMLObject parent, String name, byte value) {
-        try {
-            return Byte.parseByte(this.getAttribute(parent, name, value).toString());
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse byte from attribute: " + parent.getName() + " : " + name);
-            return value;
+            try {
+                potion.setColor(Integer.parseInt(colors[0]),
+                        Integer.parseInt(colors[1]),
+                        Integer.parseInt(colors[2]));
+            } catch (final Exception ex) {
+                Bukkit.getLogger().severe("Could not parse potion color: " + content);
+                return null;
+            }
         }
-    }
 
-    public int getAttributeInt(XMLObject parent, String name, int value) {
-        try {
-            return Integer.parseInt(this.getAttribute(parent, name, value).toString());
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse int from attribute: " + parent.getName() + " : " + name);
-            return value;
-        }
-    }
-
-    public double getAttributeDouble(XMLObject parent, String name, double value) {
-        try {
-            return Double.parseDouble(this.getAttribute(parent, name, value).toString());
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse double from attribute: " + parent.getName() + " : " + name);
-            return value;
-        }
-    }
-
-    public boolean getAttributeBoolean(XMLObject parent, String name, boolean value) {
-        try {
-            return Boolean.parseBoolean(this.getAttribute(parent, name, value).toString());
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse boolean from attribute: " + parent.getName() + " : " + name);
-            return value;
-        }
-    }
-
-    public Pair<Integer, Integer> getAttributeRange(XMLObject parent, String name, Pair<Integer, Integer> value) {
-        try {
-            String[] range = this.getAttribute(parent, name, value).toString().split("-");
-            if (range.length == 2) {
-                return new Pair<>(Integer.parseInt(range[0]), Integer.parseInt(range[1]));
-            } else if(range.length == 1) {
-                return new Pair<>(Integer.parseInt(range[0]), Integer.parseInt(range[0]));
+        // Check if the potion is a single effect potion
+        if (!element.hasChildNodes()) {
+            final PotionEffect effect = XMLParser.parsePotionEffect(element);
+            if (effect == null) {
+                return null;
             }
 
-            throw new Exception("Range must be two numbers separated by a dash");
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse range from attribute: " + parent.getName() + " : " + name);
-            return value;
+            return potion.addEffect(effect).build();
         }
-    }
 
-    public Material getAttributeMaterial(XMLObject parent, String name, Material value) {
-        try {
-            return Material.valueOf(this.getAttribute(parent, name, value).toString().replace(" ", "_").toUpperCase());
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse material from attribute: " + parent.getName() + " : " + name);
-            return value;
-        }
-    }
-
-    public PotionEffectType getAttributePotionEffect(XMLObject parent, String name, PotionEffectType value) {
-        try {
-            PotionEffectType type = PotionEffectType.getByName(parent.getContent().replace(" ", "_").toUpperCase());
-            if (type == null) {
-                throw new Exception("Potion type cannot be null");
+        // Parse each potion effect
+        for (final Element child : XMLParser.getChildElements(element)) {
+            final PotionEffect effect = XMLParser.parsePotionEffect(child);
+            if (effect == null) {
+                return null;
             }
-            return type;
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse potion effect from attribute: " + parent.getName() + " : " + name);
-            return value;
-        }
-    }
 
-    public EntityType getAttributeEntityType(XMLObject parent, String name, EntityType value) {
-        try {
-            return EntityType.valueOf(this.getAttribute(parent, name, value).toString().replace(" ", "_").toUpperCase());
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse entity type from attribute: " + parent.getName() + " : " + name);
-            return value;
-        }
-    }
+            // Check if the current effect is the base
+            if (child.getNodeName().equalsIgnoreCase("potion-base")) {
+                final String content = child.getTextContent();
 
-    public Color getAttributeColor(XMLObject parent, String name, Color value) {
-        try {
-            String[] split = this.getAttribute(parent, name, value).toString().split(",");
-            if (split.length == 1) {
-                return this.parseColor(split[0]);
+                try {
+                    potion.setBase(PotionType.valueOf(XMLParser.parseConstant(content)));
+                } catch (final Exception ex) {
+                    Bukkit.getLogger().severe("Could not parse potion base type: " + content);
+                    return null;
+                }
             }
-            return Color.fromRGB(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
-        } catch (Exception ex) {
-            Bukkit.getLogger().warning("Could not parse color from attribute: " + parent.getName() + " : " + name);
-            return value;
-        }
-    }
 
-    // * * * * * * * *
-    // Object finding
-    // * * * * * * * *
-
-    public XMLObject getRoot() {
-        return this.root;
-    }
-
-//    public XMLObject findObject(String path) {
-//        return this.find(this.root, path, 0);
-//    }
-//
-//    public XMLObject findObject(String path, XMLObject start) {
-//        return this.find(start, path, 0);
-//    }
-//
-//    public List<XMLObject> findAllObjects(String path) {
-//        XMLObject object = this.find(this.root, path, 0);
-//        return (object == null ? new ArrayList<>() : object.getChildren());
-//    }
-//
-//    public List<XMLObject> findAllObjects(String path, XMLObject start) {
-//        XMLObject object = this.find(start, path, 0);
-//        return (object == null ? new ArrayList<>() : object.getChildren());
-//    }
-//
-//    private XMLObject find(XMLObject object, String path, int index) {
-//        String[] split = path.split("\\.");
-//
-//        for (XMLObject child : object.getChildren()) {
-//            if (child.getName().equals(split[split.length - 1])) {
-//                return child;
-//            }
-//
-//            if (child.getName().equals(split[index])) {
-//                return find(child, path, ++index);
-//            }
-//        }
-//
-//        Bukkit.getLogger().warning("Could not find XML object with name: " + path);
-//        return null;
-//    }
-
-    // * * * * * * * *
-    // Private methods
-    // * * * * * * * *
-
-    private Color parseColor(String color) throws Exception {
-        switch (color.toLowerCase()) {
-            case "aqua":
-                return Color.AQUA;
-            case "black":
-                return Color.BLACK;
-            case "blue":
-                return Color.BLUE;
-            case "fuchsia":
-                return Color.FUCHSIA;
-            case "gray":
-                return Color.GRAY;
-            case "green":
-                return Color.GREEN;
-            case "lime":
-                return Color.LIME;
-            case "maroon":
-                return Color.MAROON;
-            case "navy":
-                return Color.NAVY;
-            case "olive":
-                return Color.OLIVE;
-            case "orange":
-                return Color.ORANGE;
-            case "purple":
-                return Color.PURPLE;
-            case "red":
-                return Color.RED;
-            case "silver":
-                return Color.SILVER;
-            case "teal":
-                return Color.TEAL;
-            case "white":
-                return Color.WHITE;
-            case "yellow":
-                return Color.YELLOW;
-            default:
-                throw new Exception("Invalid color: " + color);
-        }
-    }
-
-    private Object getAttribute(XMLObject parent, String name, Object value) {
-        HashMap<String, String> attributes = parent.getAttributes();
-        if (attributes.containsKey(name)) {
-            return attributes.get(name);
+            potion.addEffect(effect);
         }
 
-        return value;
+        return potion.build();
+    }
+
+    /**
+     * Parses a potion effect value
+     * <br><br>
+     * Potion effect elements are formatted as follows:
+     * <pre>{@code
+     * <potion-effect duration="3m" amplifier="2">resistance</potion-effect>
+     * }</pre>
+     * You may exclude the duration and amplifier attributes
+     * @param element The element to parse
+     * @return The corresponding potion effect or null if it was invalid
+     */
+    public static PotionEffect parsePotionEffect(final Element element) {
+        final String content = element.getTextContent();
+
+        final PotionEffectType type = PotionEffectType.getByName(XMLParser.parseConstant(content));
+        if (type == null) {
+            Bukkit.getLogger().severe("Could not parse potion effect type: " + content);
+            return null;
+        }
+
+        int duration = 0;
+        if (element.hasAttribute("duration")) {
+            duration = XMLParser.parseDuration(element.getAttribute("duration"));
+
+            if (duration == -1) {
+                return null;
+            }
+        }
+
+        int amplifier = 1;
+        if (element.hasAttribute("amplifier")) {
+            final String amplifierString = element.getAttribute("amplifier");
+
+            try {
+                amplifier = Integer.parseInt(amplifierString);
+            } catch (final Exception ex) {
+                Bukkit.getLogger().severe("Could not parse potion effect amplifier: " + amplifierString);
+                return null;
+            }
+        }
+
+        return new PotionEffect(type, duration, amplifier);
     }
 }

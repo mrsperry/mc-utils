@@ -67,6 +67,24 @@ public class XMLParser {
     }
 
     /**
+     * Gets a specific node child element
+     * @param node The parent node
+     * @param name The case insensitive name of the element
+     * @return The child element or null if none could be found
+     */
+    public static Element getChildElement(final Node node, final String name) {
+        Element result = null;
+        for (final Element element : XMLParser.getChildElements(node)) {
+            if (element.getNodeName().equalsIgnoreCase(name)) {
+                result = element;
+            }
+        }
+
+        return result;
+    }
+
+
+    /**
      * Parses a constant value
      * <br><br>
      * This capitalizes the string and replaces all spaces with underscores ex: "the example" -> "THE_EXAMPLE"

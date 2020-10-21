@@ -401,11 +401,6 @@ public class XMLParser {
 
         // Parse each potion effect
         for (final Element child : XMLParser.getChildElements(element)) {
-            final PotionEffect effect = XMLParser.parsePotionEffect(child);
-            if (effect == null) {
-                return null;
-            }
-
             // Check if the current effect is the base
             if (child.getNodeName().equalsIgnoreCase("potion-base")) {
                 final String content = child.getTextContent();
@@ -416,6 +411,13 @@ public class XMLParser {
                     Bukkit.getLogger().severe("Could not parse potion base type: " + content);
                     return null;
                 }
+
+                continue;
+            }
+
+            final PotionEffect effect = XMLParser.parsePotionEffect(child);
+            if (effect == null) {
+                return null;
             }
 
             potion.addEffect(effect);

@@ -443,6 +443,11 @@ public class XMLParser {
                     }
                 }
 
+                if (extended && upgraded) {
+                    Bukkit.getLogger().severe("A potion base cannot be both extended and upgraded: " + content);
+                    return null;
+                }
+
                 try {
                     potion.setBase(PotionType.valueOf(XMLParser.parseConstant(content)), extended, upgraded);
                 } catch (final Exception ex) {

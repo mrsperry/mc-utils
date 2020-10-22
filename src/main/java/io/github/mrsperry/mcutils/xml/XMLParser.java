@@ -287,6 +287,17 @@ public class XMLParser {
             stack.setName(element.getAttribute("name"));
         }
 
+        if (element.hasAttribute("name-color")) {
+            final String content = element.getAttribute("name-color");
+
+            try {
+                stack.setNameColor(ChatColor.valueOf(XMLParser.parseConstant(content)));
+            } catch (final Exception ex) {
+                Bukkit.getLogger().severe("Could not parse item name color: " + content);
+                return null;
+            }
+        }
+
         if (element.hasAttribute("amount")) {
             final String content = element.getAttribute("amount");
 

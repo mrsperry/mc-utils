@@ -49,6 +49,11 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder setNameColor(ChatColor color) {
+        this.meta.setDisplayName(color + this.meta.getDisplayName());
+        return this;
+    }
+
     public ItemBuilder setLore(List<String> lore) {
         this.meta.setLore(lore);
         return this;

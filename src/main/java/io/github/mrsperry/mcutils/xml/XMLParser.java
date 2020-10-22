@@ -280,6 +280,12 @@ public class XMLParser {
      * @return The corresponding item stack or null if it was invalid
      */
     public static ItemStack parseItem(final Element element) {
+        final ItemBuilder stack = new ItemBuilder();
+
+        if (element.hasAttribute("name")) {
+            stack.setName(element.getAttribute("name"));
+        }
+
         // Check if the item is strictly a material
         if (XMLParser.getChildElements(element).size() == 0) {
             final Material material = XMLParser.parseMaterial(element);
@@ -287,13 +293,7 @@ public class XMLParser {
                 return null;
             }
 
-            return new ItemStack(material);
-        }
-
-        final ItemBuilder stack = new ItemBuilder();
-
-        if (element.hasAttribute("name")) {
-            stack.setName(element.getAttribute("name"));
+            return stack.setMaterial(material).build();
         }
 
         for (final Element child : XMLParser.getChildElements(element)) {

@@ -11,6 +11,7 @@ import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionEffectTypeWrapper;
 import org.bukkit.potion.PotionType;
 
 import org.w3c.dom.Document;
@@ -286,6 +287,17 @@ public class XMLParser {
             stack.setName(element.getAttribute("name"));
         }
 
+        if (element.hasAttribute("amount")) {
+            final String content = element.getAttribute("amount");
+
+            try {
+                stack.setAmount(Integer.parseInt(content));
+            } catch (final Exception ex) {
+                Bukkit.getLogger().severe("Could not parse item amount: " + content);
+                return null;
+            }
+        }
+
         // Check if the item is strictly a material
         if (XMLParser.getChildElements(element).size() == 0) {
             final Material material = XMLParser.parseMaterial(element);
@@ -374,19 +386,13 @@ public class XMLParser {
      * <br><br>
      * Potion elements are formatted as follows:
      * <pre>{@code
-     * <potion color="238,201,75" duration="30s" amplifier="2">regeneration</potion>
-     * }</pre>
-     * You may exclude the color, duration, and amplifier attributes
-     * <br><br>
-     * For multiple effects on a single potion use the following:
-     * <pre>{@code
      * <potion color="255,255,128">
-     *     <potion-base duration="30s" amplifier="3">slowness</potion-base>
-     *     <potion-effect amplifier="3">healing</potion-effect>
-     *     <potion-effect duration="3m">resistance</potion-effect>
+     *     <base extended="true" upgraded="true">slowness</base>
+     *     <effect amplifier="3">healing</effect>
+     *     <effect duration="3m">resistance</effect>
      * </potion>
      * }</pre>
-     * The potion base defined the base effect and the other effects are added on
+     * The potion base defines the base effect with the other effects being added on
      * @param element The element to parse
      * @return A potion item stack or null if it was invalid
      */
@@ -407,24 +413,38 @@ public class XMLParser {
             }
         }
 
-        // Check if the potion is a single effect potion
-        if (!element.hasChildNodes()) {
-            final PotionEffect effect = XMLParser.parsePotionEffect(element);
-            if (effect == null) {
-                return null;
-            }
-
-            return potion.addEffect(effect).build();
-        }
-
         // Parse each potion effect
         for (final Element child : XMLParser.getChildElements(element)) {
             // Check if the current effect is the base
-            if (child.getNodeName().equalsIgnoreCase("potion-base")) {
+            if (child.getNodeName().equalsIgnoreCase("base")) {
                 final String content = child.getTextContent();
 
+                boolean extended = false;
+                if (child.hasAttribute("extended")) {
+                    final String extendedContent = child.getAttribute("extended");
+
+                    try {
+                        extended = Boolean.parseBoolean(extendedContent);
+                    } catch (final Exception ex) {
+                        Bukkit.getLogger().severe("Could not parse potion extended value: " + extendedContent);
+                        return null;
+                    }
+                }
+
+                boolean upgraded = false;
+                if (child.hasAttribute("upgraded")) {
+                    final String upgradedContent = child.getAttribute("upgraded");
+
+                    try {
+                        upgraded = Boolean.parseBoolean(upgradedContent);
+                    } catch (final Exception ex) {
+                        Bukkit.getLogger().severe("Could not parse potion upgraded value: " + upgradedContent);
+                        return null;
+                    }
+                }
+
                 try {
-                    potion.setBase(PotionType.valueOf(XMLParser.parseConstant(content)));
+                    potion.setBase(PotionType.valueOf(XMLParser.parseConstant(content)), extended, upgraded);
                 } catch (final Exception ex) {
                     Bukkit.getLogger().severe("Could not parse potion base type: " + content);
                     return null;

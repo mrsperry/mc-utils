@@ -11,7 +11,6 @@ import org.bukkit.enchantments.EnchantmentWrapper;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionEffectTypeWrapper;
 import org.bukkit.potion.PotionType;
 
 import org.w3c.dom.Document;
@@ -23,6 +22,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 public class XMLParser {
@@ -278,9 +278,10 @@ public class XMLParser {
      * }</pre>
      * The name and amount attributes are optional, as are the enchants and lore tags
      * @param element The element to parse
+     * @param random The random to use
      * @return The corresponding item stack or null if it was invalid
      */
-    public static ItemStack parseItem(final Element element) {
+    public static ItemStack parseItem(final Element element, Random random) {
         final ItemBuilder stack = new ItemBuilder();
 
         if (element.hasAttribute("name")) {
@@ -301,12 +302,15 @@ public class XMLParser {
         if (element.hasAttribute("amount")) {
             final String content = element.getAttribute("amount");
 
-            try {
-                stack.setAmount(Integer.parseInt(content));
-            } catch (final Exception ex) {
+            final Pair<Double, Double> range = XMLParser.parseRange(content);
+            if (range == null) {
                 Bukkit.getLogger().severe("Could not parse item amount: " + content);
                 return null;
             }
+
+            final int min = (int) Math.round(range.getKey());
+            final int max = (int) Math.round(range.getValue());
+            stack.setAmount(min + random.nextInt(max - min + 1));
         }
 
         // Check if the item is strictly a material

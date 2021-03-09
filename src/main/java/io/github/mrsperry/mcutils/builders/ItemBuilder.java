@@ -61,6 +61,10 @@ public class ItemBuilder {
 
     public ItemBuilder addLore(String loreLine) {
         List<String> temp = this.meta.getLore();
+        if (temp == null) {
+            temp = new ArrayList<>();
+        }
+
         temp.add(loreLine);
         return this.setLore(temp);
     }

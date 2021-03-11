@@ -26,7 +26,6 @@ public class ItemBuilder {
         }
         this.item = new ItemStack(material, 1);
         this.meta = this.item.getItemMeta();
-        this.meta.setLore(new ArrayList<String>());
     }
 
     public ItemBuilder setMaterial(Material material) {

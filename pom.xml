@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.mrsperry.mcutils</groupId>
     <artifactId>mc-utils</artifactId>
-    <version>1.0.24</version>
+    <version>1.0.25</version>
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
@@ -19,8 +19,7 @@
                 <version>3.8.1</version>
                 <configuration>
                     <release>12</release>
-                    <source>11</source>
-                    <target>11</target>
+                    <showDeprecation>true</showDeprecation>
                 </configuration>
             </plugin>
         </plugins>

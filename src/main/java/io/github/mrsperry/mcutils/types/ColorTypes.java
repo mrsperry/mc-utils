@@ -28,7 +28,17 @@ public class ColorTypes {
         return ColorTypes.colors;
     }
 
-    public static Color valueOf(String color) {
+    public static Color stringToColor(String color) {
         return ColorTypes.colors.getOrDefault(color.toUpperCase(), null);
+    }
+
+    public static String colorToString(Color color) {
+        for (Map.Entry<String, Color> current : ColorTypes.colors.entrySet()) {
+            if (current.getValue() == color) {
+                return current.getKey();
+            }
+        }
+
+        return null;
     }
 }

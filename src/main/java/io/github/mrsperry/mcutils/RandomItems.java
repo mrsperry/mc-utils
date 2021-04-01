@@ -319,7 +319,7 @@ public class RandomItems {
         // An array of all possible firework explosion types
         final FireworkEffect.Type[] types = FireworkEffect.Type.values();
         // A list of all possible firework explosion and fade colors
-        final List<Color> effectColors = ColorTypes.getColors();
+        final List<Color> effectColors = Lists.newArrayList(ColorTypes.getColors().values());
 
         final FireworkEffect.Builder effect = FireworkEffect.builder()
             .flicker(random.nextBoolean())
